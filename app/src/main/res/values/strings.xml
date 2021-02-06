@@ -11,4 +11,12 @@
     <string name="button_name">Click me</string>
     <string name="button_loading">We are loading </string>
     <string name="title_activity_detail">DetailActivity</string>
+    
+    <string name="details_notification_channel_id">details_channel</string>
+    <string name="details_notification_channel_name">Download Status</string>
+    <string name="loadapp">LoadApp-Current Repository By Udacity</string>
+    <string name="glide">Glide-Image Loading Library By BumpTech</string>
+    <string name="retrofit">Retrofit - Type Safe Http Client For Android And Java BY Square Inc</string>
+    <string name="message">Your file is ready</string>
+    <string name="notification_action">Open</string>
 </resources>

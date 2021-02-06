@@ -19,26 +19,40 @@ private const val TAG = "LoadingButton"
 class LoadingButton @JvmOverloads constructor(
     context: Context, attrs: AttributeSet? = null, defStyleAttr: Int = 0
 ) : View(context, attrs, defStyleAttr) {
+    private var angle: Float = 0f
     private var buttonBackground: Int = 0
     private var progress: Float = 0f
     private var widthSize = 0
     private var heightSize = 0
+    private var buttonText = "Download"
     private val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
-
-
         textAlign = Paint.Align.CENTER
         textSize = 55.0f
-        typeface = Typeface.create( "", Typeface.BOLD)
     }
 
-    private var valueAnimator = ValueAnimator()
+    private var buttonAnimator = ValueAnimator()
+    private var circleAnimator = ValueAnimator()
 
     var buttonState: ButtonState by Delegates.observable<ButtonState>(ButtonState.Completed) { p, old, new ->
-        if(new  == ButtonState.Loading){
-            Log.d(TAG, "Button State is :clicked ")
-            animatedButton()
+        when(new){
+            ButtonState.Loading -> {
+                buttonText = "We are loading"
+                animatedButton()
+                animatedCircle()
+            }
+            ButtonState.Completed -> {
+                stopAnimation()
+            }
+
         } 
 
+    }
+
+    private fun stopAnimation() {
+        progress = 0f
+        angle = 0f
+        buttonText = "DownLoad"
+        invalidate()
     }
 
 
@@ -53,12 +67,12 @@ class LoadingButton @JvmOverloads constructor(
 
     override fun onDraw(canvas: Canvas?) {
         super.onDraw(canvas)
-        //canvas?.drawRect((width-widthSize).toFloat(),(height-heightSize).toFloat(),widthSize.toFloat(),heightSize.toFloat(),paint)
         drawButton(canvas)
         if(buttonState == ButtonState.Loading){
             drawButtonFill(canvas)
+            drawCircle(canvas)
         }
-
+        drawText(canvas)
 
 
 
@@ -81,15 +95,25 @@ class LoadingButton @JvmOverloads constructor(
         setMeasuredDimension(w, h)
     }
     private fun animatedButton() {
-        valueAnimator = ValueAnimator.ofFloat(0F, widthSize.toFloat()).apply {
-            duration = 5000
+        buttonAnimator = ValueAnimator.ofFloat(0F, widthSize.toFloat()).apply {
+            duration = 1000
             addUpdateListener { valueAnimator ->
                 progress = valueAnimator.animatedValue as Float
-                valueAnimator.repeatCount = ValueAnimator.INFINITE
-                valueAnimator.repeatMode = ValueAnimator.REVERSE
                 valueAnimator.interpolator = LinearInterpolator()
-                this@LoadingButton.invalidate() // -> Important
+                this@LoadingButton.invalidate()
             }
+
+            start()
+        }
+    }
+    private fun animatedCircle() {
+        circleAnimator = ValueAnimator.ofFloat(0F, 360F).apply {
+            duration = 1000
+            addUpdateListener { valueAnimator ->
+                angle = valueAnimator.animatedValue as Float
+                this@LoadingButton.invalidate()
+            }
+
             start()
         }
     }
@@ -100,5 +124,14 @@ class LoadingButton @JvmOverloads constructor(
                 0f,
                 progress,
                 heightSize.toFloat(), paint)
+    }
+    private fun drawText(canvas: Canvas?) {
+        paint.color = ResourcesCompat.getColor(resources, R.color.white, null)
+        canvas?.drawText(buttonText, widthSize / 2F, (heightSize / 2F) , paint)
+    }
+    private fun drawCircle(canvas: Canvas?) {
+        paint.color= Color.YELLOW
+        canvas?.drawArc((widthSize.toFloat() - 300f),(heightSize.toFloat() / 2) - 25f, (widthSize.toFloat()-250f),
+                (heightSize.toFloat() / 2) + 25f, 0F,angle, true,paint)
     }
 }
